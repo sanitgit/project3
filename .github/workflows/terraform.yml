@@ -29,6 +29,8 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
+        env:
+          TF_VAR_public_key: ${{ secrets.TF_VAR_public_key }}
 
       - name: Terraform Plan
         run: terraform plan
