@@ -9,8 +9,10 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
-    steps:
+    env:
+      TF_VAR_public_key: ${{ secrets.TF_VAR_public_key }}
 
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -29,13 +31,9 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-        env:
-          TF_VAR_public_key: ${{ secrets.TF_VAR_public_key }}
 
       - name: Terraform Plan
         run: terraform plan
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
-        env:
-          TF_VAR_public_key: ${{ secrets.TF_VAR_public_key }}
