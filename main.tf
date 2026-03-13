@@ -19,21 +19,29 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"]
 }
 
-data "aws_vpc" "default" {
-  default = true
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Name = "project4-vpc"
+  }
 }
 
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "ap-southeast-1a"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "project4-subnet"
   }
 }
 
 resource "aws_security_group" "web_sg" {
   name        = "web-sg"
   description = "Allow SSH and HTTP"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     description = "SSH"
@@ -65,11 +73,11 @@ resource "aws_key_pair" "web_key" {
 }
 
 resource "aws_instance" "ec2_webapp" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
-  key_name               = aws_key_pair.web_key.key_name
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
-  subnet_id                   = data.aws_subnets.default.ids[0]
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t2.micro"
+  key_name                    = aws_key_pair.web_key.key_name
+  vpc_security_group_ids      = [aws_security_group.web_sg.id]
+  subnet_id                   = aws_subnet.public_subnet.id
   associate_public_ip_address = true
 
   tags = {
