@@ -18,10 +18,6 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"]
 }
 
-variable "public_key" {
-  type = string
-}
-
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 
@@ -112,8 +108,4 @@ resource "aws_instance" "ec2_webapp" {
   tags = {
     Name = "WebAppInstance"
   }
-}
-
-output "public_ip" {
-  value = aws_instance.ec2_webapp.public_ip
 }
