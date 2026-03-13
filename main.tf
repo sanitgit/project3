@@ -23,6 +23,13 @@ data "aws_vpc" "default" {
   default = true
 }
 
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
 resource "aws_security_group" "web_sg" {
   name        = "web-sg"
   description = "Allow SSH and HTTP"
@@ -62,6 +69,8 @@ resource "aws_instance" "ec2_webapp" {
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.web_key.key_name
   vpc_security_group_ids = [aws_security_group.web_sg.id]
+  subnet_id                   = data.aws_subnets.default.ids[0]
+  associate_public_ip_address = true
 
   tags = {
     Name = "WebAppInstance"
