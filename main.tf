@@ -68,7 +68,7 @@ resource "aws_security_group" "web_sg" {
 }
 
 resource "aws_key_pair" "web_key" {
-  key_name   = "project4-key"
+  key_name   = "project3-key"
   public_key = var.public_key
 }
 
