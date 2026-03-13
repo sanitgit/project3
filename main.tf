@@ -1,6 +1,5 @@
-
 provider "aws" {
-    region = "ap-southeast-1"
+  region = "ap-southeast-1"
 }
 
 data "aws_ami" "ubuntu" {
@@ -17,6 +16,10 @@ data "aws_ami" "ubuntu" {
   }
 
   owners = ["099720109477"]
+}
+
+variable "public_key" {
+  type = string
 }
 
 resource "aws_vpc" "main" {
@@ -36,6 +39,32 @@ resource "aws_subnet" "public_subnet" {
   tags = {
     Name = "project4-subnet"
   }
+}
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "project4-igw"
+  }
+}
+
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+
+  tags = {
+    Name = "project4-public-rt"
+  }
+}
+
+resource "aws_route_table_association" "public_assoc" {
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.public_rt.id
 }
 
 resource "aws_security_group" "web_sg" {
@@ -83,4 +112,8 @@ resource "aws_instance" "ec2_webapp" {
   tags = {
     Name = "WebAppInstance"
   }
+}
+
+output "public_ip" {
+  value = aws_instance.ec2_webapp.public_ip
 }
