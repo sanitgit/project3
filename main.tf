@@ -92,15 +92,10 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-resource "aws_key_pair" "web_key" {
-  key_name   = "project3-key"
-  public_key = var.public_key
-}
-
 resource "aws_instance" "ec2_webapp" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
-  key_name                    = aws_key_pair.web_key.key_name
+  key_name                    = "project3-key"
   vpc_security_group_ids      = [aws_security_group.web_sg.id]
   subnet_id                   = aws_subnet.public_subnet.id
   associate_public_ip_address = true
